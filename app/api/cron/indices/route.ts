@@ -3,11 +3,12 @@
 import { NextResponse } from "next/server";
 import { createAdminClient } from "@/lib/supabase/server";
 import { fetchIneSeries } from "@/lib/ine";
+import { isAuthorizedCron } from "@/lib/cron";
 
 export const runtime = "nodejs";
 
 export async function GET(request: Request) {
-  if (request.headers.get("authorization") !== `Bearer ${process.env.CRON_SECRET}`) {
+  if (!isAuthorizedCron(request)) {
     return NextResponse.json({ error: "No autorizado" }, { status: 401 });
   }
 

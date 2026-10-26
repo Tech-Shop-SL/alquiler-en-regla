@@ -4,6 +4,7 @@
 import { NextResponse } from "next/server";
 import { createAdminClient } from "@/lib/supabase/server";
 import { propertyAlerts, type Alert } from "@/lib/alerts";
+import { isAuthorizedCron } from "@/lib/cron";
 import { addMonths, firstOfMonth, formatShort, today } from "@/lib/dates";
 import type { Payment, Profile, Property, RentChange } from "@/lib/types";
 
@@ -35,7 +36,7 @@ async function sendEmail(to: string, alerts: Alert[]) {
 }
 
 export async function GET(request: Request) {
-  if (request.headers.get("authorization") !== `Bearer ${process.env.CRON_SECRET}`) {
+  if (!isAuthorizedCron(request)) {
     return NextResponse.json({ error: "No autorizado" }, { status: 401 });
   }
 
